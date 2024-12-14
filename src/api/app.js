@@ -1,4 +1,4 @@
-import client from "@/services/mongo"
+import supabase from "@/services/supabase"
 import { useTelegram } from "@/services/telegram"
 
 const { user } = useTelegram()
@@ -6,7 +6,8 @@ const { user } = useTelegram()
 const MY_ID = user?.id ?? 4252
 
 export async function getOrCreateUser () {
-    const potentialUser = await client.db('crypto_cat').collection('users').select().eq('telegram', MY_ID)
+    //await client.connect()
+    const potentialUser = await supabase.from('users').select().eq('telegram', MY_ID)
     
     if (potentialUser.data.length != 0) {
         return potentialUser.data[0]
@@ -17,11 +18,14 @@ export async function getOrCreateUser () {
         score: 0,
     }
 
-    await client.db('crypto_cat').collection('users').insert(newUser)
+    await supabase.from('users').insert(newUser)
+    //await client.close()
     return newUser
 }
 
 export async function updateScore (score) {
-    await client.db('crypto_cat').collection('users').update({ score }).eq('telegram', MY_ID)
+    //await client.connect()
+    await supabase.from('users').update({ score }).eq('telegram', MY_ID)
+   //await client.close()
 }
 
